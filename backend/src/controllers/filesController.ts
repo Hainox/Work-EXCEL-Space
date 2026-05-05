@@ -1,0 +1,55 @@
+import type { Response, NextFunction } from 'express'
+import { prisma } from '../utils/prisma'
+import { filesService } from '../services/filesService'
+import type { AuthRequest } from '../middlewares/authenticate'
+
+export async function listFiles(req: AuthRequest, res: Response, next: NextFunction) {
+  try {
+    const files = await prisma.file.findMany({
+      where: { userId: req.userId! },
+      orderBy: { uploadedAt: 'desc' },
+    })
+    res.json(files)
+  } catch (err) {
+    next(err)
+  }
+}
+
+export async function uploadFile(req: AuthRequest, res: Response, next: NextFunction) {
+  try {
+    if (!req.file) {
+      res.status(400).json({ message: 'No file uploaded' })
+      return
+    }
+    const file = await filesService.save({
+      userId: req.userId!,
+      originalName: req.file.originalname,
+      size: req.file.size,
+      path: req.file.path,
+    })
+    res.status(201).json(file)
+  } catch (err) {
+    next(err)
+  }
+}
+
+export async function deleteFile(req: AuthRequest, res: Response, next: NextFunction) {
+  try {
+    const id = String(req.params.id)
+    await filesService.remove({ fileId: id, userId: req.userId! })
+    res.status(204).send()
+  } catch (err) {
+    next(err)
+  }
+}
+
+export async function getSheet(req: AuthRequest, res: Response, next: NextFunction) {
+  try {
+    const id = String(req.params.id)
+    const sheetName = String(req.params.sheetName)
+    const sheet = await filesService.readSheet({ fileId: id, userId: req.userId!, sheetName })
+    res.json(sheet)
+  } catch (err) {
+    next(err)
+  }
+}

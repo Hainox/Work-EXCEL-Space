@@ -1,33 +1,34 @@
 # Work EXCEL Space
 
-> Веб-приложение для совместной работы с Excel-файлами в облаке: загрузка, просмотр, редактирование и экспорт таблиц прямо в браузере.
+> Персональный аналитический стол для работы с Excel-файлами в браузере: загрузка, просмотр, фильтрация, сортировка, визуализации и экспорт данных — всё в одном месте.
 
 ---
 
 ## 📌 О продукте
 
-**Work EXCEL Space** — это платформа для командной работы с Excel-файлами без необходимости устанавливать Microsoft Office. Пользователи могут загружать `.xlsx`-файлы, просматривать и редактировать их онлайн, делиться с коллегами и экспортировать обратно.
+**Work EXCEL Space** — это персональное веб-приложение для дата-аналитика. Позволяет загружать `.xlsx`-файлы, исследовать данные, строить графики и экспортировать результаты, не выходя из браузера. Никаких командных функций — только вы и ваши данные.
 
 ### Ключевые возможности (MVP)
 
-- 🔐 Авторизация / регистрация пользователей (JWT)
-- 📁 Загрузка и хранение Excel-файлов
-- 👁 Просмотр таблиц в браузере
-- ✏️ Базовое редактирование ячеек
-- 📤 Экспорт в `.xlsx`
-- 👥 Совместный доступ к файлам
+- 🔐 Личная учётная запись (JWT-авторизация)
+- 📁 Загрузка и хранение Excel-файлов (`.xlsx`)
+- 📊 Табличный просмотр данных с фильтрацией и сортировкой
+- 📈 Базовые визуализации (столбчатая диаграмма, линейный график)
+- ✏️ Редактирование отдельных ячеек
+- 📤 Экспорт результатов обратно в `.xlsx`
+- 🗂 Личная история загрузок
 
 ---
 
 ## 🛠 Стек технологий
 
-| Слой       | Технологии                                        |
-|------------|---------------------------------------------------|
-| Frontend   | Vite, React 18, TypeScript, Tailwind CSS, Vitest  |
-| Backend    | Node.js, Express, TypeScript, Prisma ORM, Vitest  |
-| База данных| PostgreSQL                                        |
-| CI/CD      | GitHub Actions                                    |
-| Деплой     | Vercel (frontend), Railway (backend + PostgreSQL) |
+| Слой        | Технологии                                          |
+|-------------|-----------------------------------------------------|
+| Frontend    | Vite, React 18, TypeScript, Tailwind CSS, Vitest    |
+| Backend     | Node.js, Express, TypeScript, Prisma ORM, Vitest    |
+| База данных | PostgreSQL                                          |
+| CI/CD       | GitHub Actions                                      |
+| Деплой      | Vercel (frontend) · Railway (backend + PostgreSQL)  |
 
 ---
 
@@ -37,13 +38,13 @@
 work-excel-space/
 ├── frontend/                  # Vite + React + TypeScript
 │   ├── src/
-│   │   ├── api/               # HTTP-клиент и запросы к API
-│   │   ├── components/        # UI-компоненты
+│   │   ├── api/               # HTTP-клиент и вызовы API
+│   │   ├── components/        # Переиспользуемые UI-компоненты
 │   │   ├── hooks/             # Кастомные React-хуки
 │   │   ├── pages/             # Страницы приложения
 │   │   ├── types/             # TypeScript-типы и интерфейсы
 │   │   └── utils/             # Вспомогательные функции
-│   ├── .eslintrc.cjs
+│   ├── eslint.config.js
 │   ├── .prettierrc
 │   ├── vite.config.ts
 │   └── package.json
@@ -84,7 +85,7 @@ work-excel-space/
 ```bash
 cd frontend
 npm install
-npm run dev
+npm run dev        # http://localhost:5173
 ```
 
 ### Backend
@@ -94,7 +95,7 @@ cd backend
 npm install
 cp .env.example .env   # заполните DATABASE_URL и JWT_SECRET
 npx prisma migrate dev
-npm run dev
+npm run dev        # http://localhost:3000
 ```
 
 ---
@@ -122,22 +123,22 @@ npm run test
 1. Подключите репозиторий к [vercel.com](https://vercel.com).
 2. Root Directory: `frontend`.
 3. Framework Preset: `Vite`.
-4. Добавьте переменную `VITE_API_URL` → URL вашего backend.
+4. Переменная окружения: `VITE_API_URL` → URL вашего backend.
 
 ### Backend → Railway
 
 1. Создайте новый проект на [railway.app](https://railway.app).
 2. Добавьте сервис PostgreSQL.
-3. Подключите репозиторий, укажите Root Directory: `backend`.
-4. Добавьте переменные: `DATABASE_URL`, `JWT_SECRET`, `PORT`.
+3. Подключите репозиторий, Root Directory: `backend`.
+4. Переменные: `DATABASE_URL`, `JWT_SECRET`, `PORT`.
 
 ---
 
 ## 🔄 CI/CD
 
-GitHub Actions запускается при каждом Pull Request и пуше в `main`:
+GitHub Actions запускает при каждом Pull Request и пуше в `main`:
 
-- Линтинг фронтенда и бэкенда
+- Линтинг frontend и backend
 - Запуск тестов (Vitest)
 - Проверка типов TypeScript
 
@@ -145,14 +146,12 @@ GitHub Actions запускается при каждом Pull Request и пуш
 
 ## 📋 Conventional Commits
 
-Формат коммитов в проекте:
-
 ```
 feat:     новая функциональность
 fix:      исправление бага
-chore:    инфраструктурные изменения
+chore:    инфраструктура и настройки
 docs:     изменения документации
-test:     добавление/изменение тестов
+test:     добавление / изменение тестов
 refactor: рефакторинг без изменения поведения
 ```
 
