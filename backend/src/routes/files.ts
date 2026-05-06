@@ -29,8 +29,8 @@ const filesLimiter = rateLimit({
 
 export const filesRouter = Router()
 
-filesRouter.use(authenticate)
 filesRouter.use(filesLimiter)
+filesRouter.use(authenticate)
 filesRouter.get('/', listFiles)
 filesRouter.post('/', upload.single('file'), uploadFile)
 filesRouter.delete('/:id', deleteFile)

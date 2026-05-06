@@ -1,7 +1,10 @@
+import { useNavigate } from 'react-router-dom'
 import { Button } from '../components/Button'
 import { Badge } from '../components/Badge'
 
 export function WelcomePage() {
+  const navigate = useNavigate()
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex flex-col items-center justify-center px-4">
       <div className="max-w-2xl w-full text-center space-y-6">
@@ -48,8 +51,8 @@ export function WelcomePage() {
 
         {/* CTA */}
         <div className="flex gap-3 justify-center pt-2">
-          <Button onClick={() => alert('Coming soon: Login')}>Войти</Button>
-          <Button variant="secondary" onClick={() => alert('Coming soon: Sign up')}>
+          <Button onClick={() => navigate('/login')}>Войти</Button>
+          <Button variant="secondary" onClick={() => navigate('/register')}>
             Создать аккаунт
           </Button>
         </div>
