@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { TableView } from '../components/TableView'
 import type { Column, Row } from '../types/spreadsheet'
@@ -72,6 +72,26 @@ describe('TableView', () => {
     // First data cell should be Bob (72) in ascending Score order
     expect(cells[0].textContent).toBe('Bob')
   })
+  it('edits the original row index after sorting', async () => {
+    const onCellEdit = vi.fn().mockResolvedValue(undefined)
+    render(
+      <MemoryRouter>
+        <TableView columns={columns} rows={rows} onCellEdit={onCellEdit} />
+      </MemoryRouter>,
+    )
+
+    fireEvent.click(screen.getByText(/Score/))
+    fireEvent.doubleClick(screen.getByText('Bob'))
+
+    const input = screen.getByDisplayValue('Bob')
+    fireEvent.change(input, { target: { value: 'Bobby' } })
+    fireEvent.keyDown(input, { key: 'Enter' })
+
+    await waitFor(() => {
+      expect(onCellEdit).toHaveBeenCalledWith(1, '1', 'Bobby')
+    })
+  })
+
 })
 
 describe('UploadZone', () => {

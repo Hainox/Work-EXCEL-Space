@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
 import type { Column, Row, SortConfig, CellValue } from '../types/spreadsheet'
-import { sortRows } from '../utils/table'
 
 interface TableViewProps {
   columns: Column[]
@@ -23,17 +22,26 @@ export function TableView({ columns, rows, onCellEdit }: TableViewProps) {
 
   const activeFilter = search.trim()
 
-  const displayed = sortRows(
-    activeFilter
-      ? rows.filter((row) =>
-          columns.some((col) => {
+  const filtered = rows
+    .map((row, sourceIndex) => ({ row, sourceIndex }))
+    .filter(({ row }) =>
+      activeFilter
+        ? columns.some((col) => {
             const val = row[col.key]
             return val != null && String(val).toLowerCase().includes(activeFilter.toLowerCase())
-          }),
-        )
-      : rows,
-    sort,
-  )
+          })
+        : true,
+    )
+
+  const displayed = sort
+    ? [...filtered].sort((a, b) => {
+        const av = a.row[sort.key]
+        const bv = b.row[sort.key]
+        if (av === bv) return 0
+        const cmp = av == null ? -1 : bv == null ? 1 : av < bv ? -1 : 1
+        return sort.direction === 'asc' ? cmp : -cmp
+      })
+    : filtered
 
   function toggleSort(key: string) {
     setSort((prev) => {
@@ -116,19 +124,19 @@ export function TableView({ columns, rows, onCellEdit }: TableViewProps) {
                 </td>
               </tr>
             ) : (
-              displayed.map((row, i) => (
+              displayed.map(({ row, sourceIndex }, i) => (
                 <tr
                   key={i}
                   className={`border-b border-gray-100 ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'} hover:bg-blue-50/40 transition-colors`}
                 >
                   {columns.map((col) => {
                     const isEditing =
-                      editing?.rowIndex === i && editing?.colKey === col.key
+                      editing?.rowIndex === sourceIndex && editing?.colKey === col.key
                     return (
                       <td
                         key={col.key}
                         className="px-3 py-2 text-gray-700 whitespace-nowrap"
-                        onDoubleClick={() => startEdit(i, col.key, row[col.key])}
+                        onDoubleClick={() => startEdit(sourceIndex, col.key, row[col.key])}
                       >
                         {isEditing ? (
                           <input
