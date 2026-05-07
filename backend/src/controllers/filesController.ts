@@ -69,9 +69,9 @@ export async function exportFile(req: AuthRequest, res: Response, next: NextFunc
   try {
     const id = String(req.params.id)
     const { filePath, fileName } = await filesService.exportFile({ fileId: id, userId: req.userId! })
-    const ext = path.extname(fileName) || '.xlsx'
+    const downloadName = path.extname(fileName) ? fileName : `${fileName}.xlsx`
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}${ext === '.xlsx' ? '' : '.xlsx'}"`)
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(downloadName)}"`)
     res.sendFile(path.resolve(filePath))
   } catch (err) {
     next(err)
