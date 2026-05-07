@@ -35,12 +35,19 @@ export function TableView({ columns, rows, onCellEdit }: TableViewProps) {
 
   const displayed = sort
     ? [...filtered].sort((a, b) => {
-        const av = a.row[sort.key]
-        const bv = b.row[sort.key]
-        if (av === bv) return 0
-        const cmp = av == null ? -1 : bv == null ? 1 : av < bv ? -1 : 1
-        return sort.direction === 'asc' ? cmp : -cmp
-      })
+      const av = a.row[sort.key]
+      const bv = b.row[sort.key]
+      if (av === bv) return 0
+      const cmp =
+        av == null
+          ? -1
+          : bv == null
+            ? 1
+            : av < bv
+              ? -1
+              : 1
+      return sort.direction === 'asc' ? cmp : -cmp
+    })
     : filtered
 
   function toggleSort(key: string) {
