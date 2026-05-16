@@ -9,6 +9,13 @@ export async function listFiles(req: AuthRequest, res: Response, next: NextFunct
     const files = await prisma.file.findMany({
       where: { userId: req.userId! },
       orderBy: { uploadedAt: 'desc' },
+      select: {
+        id: true,
+        name: true,
+        size: true,
+        uploadedAt: true,
+        sheetCount: true,
+      },
     })
     res.json(files)
   } catch (err) {
@@ -104,8 +111,17 @@ export async function updateCell(req: AuthRequest, res: Response, next: NextFunc
       col: number
       value: string | number | boolean | null
     }
-    if (typeof row !== 'number' || typeof col !== 'number') {
-      res.status(400).json({ message: 'row and col must be numbers' })
+    if (
+      typeof row !== 'number' ||
+      !Number.isFinite(row) ||
+      !Number.isInteger(row) ||
+      row < 1 ||
+      typeof col !== 'number' ||
+      !Number.isFinite(col) ||
+      !Number.isInteger(col) ||
+      col < 1
+    ) {
+      res.status(400).json({ message: 'row and col must be positive integers' })
       return
     }
     await filesService.updateCell({ fileId: id, userId: req.userId!, sheetName, row, col, value })

@@ -56,8 +56,22 @@ export const filesService = {
   async remove({ fileId, userId }: RemoveInput) {
     const record = await prisma.file.findFirst({ where: { id: fileId, userId } })
     if (!record) throw new Error('File not found')
-    if (fs.existsSync(record.path)) fs.unlinkSync(record.path)
-    await prisma.file.delete({ where: { id: fileId } })
+
+    try {
+      await fs.promises.unlink(record.path)
+    } catch (error: any) {
+      if (error?.code !== 'ENOENT') {
+        throw new Error(`Failed to delete file from disk: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      }
+    }
+
+    try {
+      await prisma.file.delete({ where: { id: fileId } })
+    } catch (error) {
+      throw new Error(
+        `Failed to delete file record from database: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
+    }
   },
 
   async listSheets({ fileId, userId }: { fileId: string; userId: string }) {
