@@ -13,6 +13,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: claude-${{ github.event.pull_request.number || github.event.issue.number || github.run_id }}
+  cancel-in-progress: false
+
 jobs:
   claude-interactive:
     name: Claude (interactive)
@@ -24,6 +28,7 @@ jobs:
         (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || github.event.action == 'assigned'))
       )
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: write
       pull-requests: write
@@ -45,6 +50,7 @@ jobs:
     name: Claude (PR review)
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
       pull-requests: write
@@ -64,7 +70,7 @@ jobs:
             2. Качество формул и вычислений (если применимо)
             3. Безопасность обработки данных
             4. Читаемость и структуру кода
-            5. Совместимость и потенциальные проблемы
+            5. Совместимость и потенциамьные проблемы
             Оставь структурированный комментарий на русском языке с конкретными рекомендациями.
           claude_args: |
             --model claude-sonnet-4-6
